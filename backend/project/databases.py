@@ -15,6 +15,6 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT', 5432),
         'NAME': os.getenv('DB_NAME', 'ambassador_db'),
         'USER': os.getenv('DB_USER', 'ambassador_user'),
-        'PASSWORD': os.getenv('DB_PASS', 'Am190588')
+        'PASSWORD': os.getenv('DB_PASS', 'ambassador_pass')
     }
 }

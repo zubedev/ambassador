@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  backend:
+    container_name: backend
+    build: .
+    volumes:
+      - .:/backend
+    ports:
+      - 8888:8000
+    environment:
+      - DB_HOST=db
+      - DB_NAME=ambassador_db
+      - DB_USER=ambassador_user
+      - DB_PASS=ambassador_pass
+    depends_on:
+      - db
+
+  db:
+    container_name: pgdb
+    image: postgres:13-alpine
+    ports:
+      - 54321:5432
+    environment:
+      - POSTGRES_DB=ambassador_db
+      - POSTGRES_USER=ambassador_user
+      - POSTGRES_PASSWORD=ambassador_pass
