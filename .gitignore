@@ -277,6 +277,12 @@ dist/
 tmp/
 temp/
 
+# db data
+.db
+db
+.dbdata
+dbdata
+
 # IDE
 .idea
 .vscode

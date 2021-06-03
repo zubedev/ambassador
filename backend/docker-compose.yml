@@ -19,6 +19,8 @@ services:
   db:
     container_name: pgdb
     image: postgres:13-alpine
+    volumes:
+    - .db:/var/lib/postgresql/data
     ports:
       - 54321:5432
     environment:
