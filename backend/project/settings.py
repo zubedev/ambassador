@@ -9,8 +9,14 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+from logging import getLogger
 from pathlib import Path
+
+from .logging import LOGGING as LOG_CONFIG
+
+# Set the python logger and django logging
+logger = getLogger(__name__)
+LOGGING = LOG_CONFIG
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -75,12 +81,14 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+try:
+    from .databases import DATABASES as DB_CONFIG
+except (ImportError, ModuleNotFoundError) as e:
+    err_msg = "Must properly implement 'databases.py' with DATABASES variable"
+    logger.error(err_msg)
+    raise NotImplementedError(err_msg)
+
+DATABASES = DB_CONFIG
 
 
 # Password validation
