@@ -76,13 +76,13 @@ class UserAdmin(UserAdmin):
     ordering = ('id', )
     list_display = (
         'id', 'email', 'first_name', 'last_name', 'last_login', 'date_joined',
-        'is_staff', 'is_superuser', 'is_active')
+        'is_ambassador', 'is_staff', 'is_superuser', 'is_active')
     list_display_links = ('id', 'email')
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Personal Info', {'fields': ('first_name', 'last_name')}),
         ('Permissions', {'fields': ('groups', 'user_permissions')}),
-        ('Roles', {'fields': ('is_staff', 'is_superuser', 'is_active')}),
+        ('Roles', {'fields': ('is_ambassador', 'is_staff', 'is_superuser', 'is_active')}),
         ('Dates', {'fields': ('last_login', 'date_joined')}))
     add_fieldsets = (
         (None, {
@@ -92,3 +92,4 @@ class UserAdmin(UserAdmin):
         }),)
     readonly_fields = ('last_login', 'date_joined')
     search_fields = ('id', 'email', 'first_name', 'last_name')
+    list_filter = ('is_ambassador', 'is_staff', 'is_superuser', 'is_active', 'groups')

@@ -30,6 +30,7 @@ class UserManager(BaseUserManager):
         """Creates and returns a new user using an email address"""
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
+        extra_fields.setdefault('is_ambassador', False)
         logger.debug(f"Creating user: email={email}, "
                      f"extra_fields={extra_fields}")
         return self._create_user(email, password, **extra_fields)
@@ -38,6 +39,7 @@ class UserManager(BaseUserManager):
         """Creates and returns a new staffuser using an email address"""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', False)
+        extra_fields.setdefault('is_ambassador', False)
         logger.debug(f"Creating staffuser: email={email}, "
                      f"extra_fields={extra_fields}")
         return self._create_user(email, password, **extra_fields)
@@ -46,6 +48,7 @@ class UserManager(BaseUserManager):
         """Creates and returns a new superuser using an email address"""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_ambassador', False)
         logger.debug(f"Creating superuser: email={email}, "
                      f"extra_fields={extra_fields}")
         return self._create_user(email, password, **extra_fields)

@@ -66,6 +66,8 @@ INSTALLED_APPS = [
     'django_probes',
     # project apps
     'core',
+    'common',
+    'administrator',
 ]
 
 MIDDLEWARE = [

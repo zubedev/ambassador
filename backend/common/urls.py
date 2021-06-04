@@ -1,6 +1,6 @@
 from django.urls import path
 
-from backend.common import views
+from common import views
 
 urlpatterns = [
     # auth

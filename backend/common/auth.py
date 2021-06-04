@@ -1,11 +1,10 @@
 from logging import getLogger
-import jwt
 
+import jwt
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework import exceptions
-
 from rest_framework.authentication import BaseAuthentication
 
 logger = getLogger(__name__)
