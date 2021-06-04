@@ -26,12 +26,29 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-xf%rv(t#g#q)031nh$362roharjgf@@o#g5rx^mv^169+v#ue#'
+try:
+    from .local_config import SECRET_KEY as SECRET
+except (ImportError, ModuleNotFoundError) as e:
+    err_msg = "Must properly implement 'local_config.py' with SECRET_KEY var"
+    logger.error(err_msg)
+    raise NotImplementedError(err_msg)
+SECRET_KEY = SECRET
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+try:
+    from .local_config import DEBUG as DEBUG_CONFIG
+except (ImportError, ModuleNotFoundError) as e:
+    err_msg = "Must properly implement 'local_config.py' with DEBUG value"
+    logger.error(err_msg)
+    raise NotImplementedError(err_msg)
+DEBUG = DEBUG_CONFIG
 
 ALLOWED_HOSTS = []
+
+# CORS HEADERS
+# CORS_ALLOWED_ORIGINS = ALLOWED_HOSTS or []
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # Allows from all origins when DEBUG mode is on
+CORS_ALLOW_CREDENTIALS = True  # cookies will be allowed to be included
 
 
 # Application definition
@@ -45,6 +62,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 3rd party apps
     'rest_framework',
+    'corsheaders',
     'django_probes',
     # project apps
     'core',
@@ -53,6 +71,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # cors headers
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -85,14 +104,12 @@ AUTH_USER_MODEL = 'core.User'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
 try:
-    from .databases import DATABASES as DB_CONFIG
+    from .local_config import DATABASES as DB_CONFIG
 except (ImportError, ModuleNotFoundError) as e:
-    err_msg = "Must properly implement 'databases.py' with DATABASES variable"
+    err_msg = "Must properly implement 'local_config.py' with DATABASES config"
     logger.error(err_msg)
     raise NotImplementedError(err_msg)
-
 DATABASES = DB_CONFIG
 
 
@@ -114,13 +131,29 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# REST_FRAMEWORK = {
-#     # Use Django's standard `django.contrib.auth` permissions,
-#     # or allow read-only access for unauthenticated users.
-#     'DEFAULT_PERMISSION_CLASSES': [
-#         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-#     ]
-# }
+
+# Django REST Framework
+# https://www.django-rest-framework.org/api-guide/settings/
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication'
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        # django-filters
+        # https://www.django-rest-framework.org/api-guide/filtering/
+        # https://django-filter.readthedocs.io/en/latest/guide/rest_framework.html
+        'django_filters.rest_framework.DjangoFilterBackend',
+        # https://www.django-rest-framework.org/api-guide/filtering/#searchfilter
+        'rest_framework.filters.SearchFilter',
+        # https://www.django-rest-framework.org/api-guide/filtering/#orderingfilter
+        'rest_framework.filters.OrderingFilter'
+    ]
+}
 
 
 # Internationalization

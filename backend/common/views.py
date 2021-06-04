@@ -3,15 +3,18 @@ from logging import getLogger
 from django.contrib.auth import get_user_model
 
 from rest_framework import exceptions
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .auth import JWTAuth
 from .serializers import UserSerializer
 
 logger = getLogger(__name__)
 
 
 class RegisterAPIView(APIView):
+    permission_classes = (AllowAny,)  # override default: IsAuthenticated
 
     def post(self, request):
         """POST method for Register"""
@@ -33,6 +36,7 @@ class RegisterAPIView(APIView):
 
 
 class LoginAPIView(APIView):
+    permission_classes = (AllowAny, )  # override default: IsAuthenticated
 
     def post(self, request):
         """POST method for Login"""
@@ -45,7 +49,11 @@ class LoginAPIView(APIView):
         # check for correct password
         if not user.check_password(data.get('password')):
             raise exceptions.AuthenticationFailed('Incorrect password!')
-        # serialize the user object
-        ser = UserSerializer(user)
+        # get jwt
+        jwt = JWTAuth().get_jwt(user.id)
+        # set cookie
+        res = Response()
+        res.set_cookie('jwt', jwt, httponly=True)
+        res.data = {'message': 'success'}
 
-        return Response(data=ser.data)
+        return res
