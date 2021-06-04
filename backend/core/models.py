@@ -63,3 +63,14 @@ class User(AbstractUser):
     objects = UserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+
+
+class Product(models.Model):
+    """Product model"""
+    title = models.CharField(max_length=100)
+    description = models.TextField(max_length=254)
+    image = models.CharField(max_length=254)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.title

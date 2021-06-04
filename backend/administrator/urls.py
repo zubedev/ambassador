@@ -1,9 +1,14 @@
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
 from administrator import views
 
+router = DefaultRouter()
+router.register('products', views.ProductViewSet)
+
 urlpatterns = [
     path('', include('common.urls')),
+    path('', include(router.urls)),
 
     path('ambassadors/', views.AmbassadorsAPIView.as_view(), name='ambassadors'),
 ]
