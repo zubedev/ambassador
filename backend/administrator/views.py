@@ -5,9 +5,9 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializer import ProductSerializer, LinkSerializer
+from .serializer import ProductSerializer, LinkSerializer, OrderSerializer
 from common.serializers import UserSerializer
-from core.models import Product, Link
+from core.models import Product, Link, Order
 
 logger = getLogger(__name__)
 
@@ -68,3 +68,16 @@ class LinksAPIView(APIView):
         ser = LinkSerializer(links, many=True)
 
         return Response(ser.data)
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    """CRUD view set for Order model and serializer"""
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    # authentication_classes = ()  # check defaults in settings
+    # permission_classes = ()  # check defaults in settings
+    # filter_backends = ()  # check defaults in settings
+    search_field = ('id', 'trans_id', 'code', 'amb_email', 'email',
+                    'first_name', 'last_name', 'city', 'country', 'zip')
+    ordering_fields = ('id', 'trans_id', 'code', 'created_at', 'updated_at')
+    ordering = 'id'

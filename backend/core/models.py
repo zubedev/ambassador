@@ -96,3 +96,35 @@ class Link(TimeStampedModel):
 
     def __str__(self):
         return self.code
+
+
+class Order(TimeStampedModel):
+    """Order model"""
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    trans_id = models.CharField(max_length=100)
+    code = models.CharField(max_length=100)
+    amb_email = models.EmailField()
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
+    email = models.EmailField()
+    address = models.CharField(max_length=254, null=True)
+    city = models.CharField(max_length=100, null=True)
+    country = models.CharField(max_length=100, null=True)
+    zip = models.CharField(max_length=15, null=True)
+    is_complete = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.code
+
+
+class OrderItem(TimeStampedModel):
+    """Order Item model"""
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
+    title = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.PositiveIntegerField()
+    admin_revenue = models.DecimalField(max_digits=10, decimal_places=2)
+    ambassador_revenue = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.title
