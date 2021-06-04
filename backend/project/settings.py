@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'core',
     'common',
     'administrator',
+    'ambassador',
 ]
 
 MIDDLEWARE = [

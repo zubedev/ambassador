@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework import exceptions
 from rest_framework.permissions import AllowAny
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -16,7 +17,7 @@ logger = getLogger(__name__)
 class RegisterAPIView(APIView):
     permission_classes = (AllowAny,)  # override default: IsAuthenticated
 
-    def post(self, request):
+    def post(self, request: Request):
         """POST method for Register"""
         data: dict = request.data
 
@@ -25,7 +26,7 @@ class RegisterAPIView(APIView):
             raise exceptions.APIException('Passwords do not match!')
 
         # set is_ambassador attribute
-        data.update({'is_ambassador': 0})
+        data.update({'is_ambassador': 'api/ambassador/' in request.path})
 
         # serialize the data
         ser = UserSerializer(data=data)
