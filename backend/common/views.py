@@ -50,10 +50,19 @@ class LoginAPIView(APIView):
         if not user.check_password(data.get('password')):
             raise exceptions.AuthenticationFailed('Incorrect password!')
         # get jwt
-        jwt = JWTAuth().get_jwt(user.id)
+        jwt = JWTAuth.get_jwt(user.id)
         # set cookie
         res = Response()
         res.set_cookie('jwt', jwt, httponly=True)
         res.data = {'message': 'success'}
 
         return res
+
+
+class UserAPIView(APIView):
+    # authentication_classes = (JWTAuth, )  # set as default in settings
+    # permission_classes = (IsAuthenticated, )  # set as default in settings
+
+    def get(self, request):
+        """GET method for User Info API"""
+        return Response(UserSerializer(request.user).data)
