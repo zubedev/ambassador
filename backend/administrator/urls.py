@@ -11,4 +11,5 @@ urlpatterns = [
     path('', include(router.urls)),
 
     path('ambassadors/', views.AmbassadorsAPIView.as_view(), name='ambassadors'),
+    path('users/<int:pk>/links/', views.LinksAPIView.as_view(), name='links'),
 ]

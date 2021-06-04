@@ -5,9 +5,9 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializer import ProductSerializer
+from .serializer import ProductSerializer, LinkSerializer
 from common.serializers import UserSerializer
-from core.models import Product
+from core.models import Product, Link
 
 logger = getLogger(__name__)
 
@@ -60,3 +60,11 @@ class ProductViewSet(viewsets.ModelViewSet):
         """overriding to enable logging"""
         logger.debug(f"Deleting product... {self.lookup_field}={kwargs[self.lookup_field]}")
         return super().destroy(request, *args, **kwargs)
+
+
+class LinksAPIView(APIView):
+    def get(self, request, pk=None):
+        links = Link.objects.filter(pk=pk)
+        ser = LinkSerializer(links, many=True)
+
+        return Response(ser.data)

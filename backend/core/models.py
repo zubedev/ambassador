@@ -7,6 +7,18 @@ from django.db import models
 logger = getLogger(__name__)
 
 
+class TimeStampedModel(models.Model):
+    """
+    An abstract base class model that provides self-updating
+    ``created_at`` and ``updated_at`` fields.
+    """
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
 class UserManager(BaseUserManager):
     """User Manager overridden from BaseUserManager for User"""
 
@@ -65,7 +77,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
 
-class Product(models.Model):
+class Product(TimeStampedModel):
     """Product model"""
     title = models.CharField(max_length=100)
     description = models.TextField(max_length=254)
@@ -74,3 +86,13 @@ class Product(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Link(TimeStampedModel):
+    """Product and User model Link"""
+    code = models.CharField(max_length=100, unique=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    products = models.ManyToManyField(Product)
+
+    def __str__(self):
+        return self.code
