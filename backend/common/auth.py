@@ -20,24 +20,36 @@ class JWTAuth(BaseAuthentication):
         if not token:  # then user is not authenticated
             return None
 
-        try:
+        try:  # decode the jwt
             payload = jwt.decode(
                 token, settings.SECRET_KEY, algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
             raise exceptions.AuthenticationFailed('Token has expired!')
 
-        try:
+        # scope validation
+        is_ambassador_url = 'api/ambassador' in request.path
+        scope = payload.get('scope')
+        if (is_ambassador_url and scope != 'ambassador') or \
+                (not is_ambassador_url and scope != 'admin'):
+            raise exceptions.AuthenticationFailed('Invalid scope!')
+
+        try:  # get the user object
             user = USER_MODEL.objects.get(pk=payload.get('uid'))
         except USER_MODEL.DoesNotExist:
             raise exceptions.AuthenticationFailed('User not found!')
 
+        # set login time
+        user.last_login = timezone.now()
+        user.save()
+
         return user, None
 
     @staticmethod
-    def get_jwt(uid: int):
+    def get_jwt(uid: int, scope: str):
         """Generates JWT with given user ID"""
         payload = {
             "uid": uid,  # user id
+            "scope": scope,  # admin or ambassador
             "exp": timezone.now() + timezone.timedelta(minutes=15),  # expiry
             "iat": timezone.now()  # issued at
         }

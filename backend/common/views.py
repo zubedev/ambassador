@@ -1,7 +1,6 @@
 from logging import getLogger
 
 from django.contrib.auth import get_user_model
-from django.utils import timezone
 from rest_framework import exceptions
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
@@ -26,7 +25,7 @@ class RegisterAPIView(APIView):
             raise exceptions.APIException('Passwords do not match!')
 
         # set is_ambassador attribute
-        data.update({'is_ambassador': 'api/ambassador/' in request.path})
+        data.update({'is_ambassador': 'api/ambassador' in request.path})
 
         # serialize the data
         ser = UserSerializer(data=data)
@@ -39,7 +38,7 @@ class RegisterAPIView(APIView):
 class LoginAPIView(APIView):
     permission_classes = (AllowAny, )  # override default: IsAuthenticated
 
-    def post(self, request):
+    def post(self, request: Request):
         """POST method for Login"""
         data: dict = request.data
         # get the user
@@ -50,11 +49,12 @@ class LoginAPIView(APIView):
         # check for correct password
         if not user.check_password(data.get('password')):
             raise exceptions.AuthenticationFailed('Incorrect password!')
-        # set login time
-        user.last_login = timezone.now()
-        user.save()
+        # set scope
+        scope = 'ambassador' if 'api/ambassador' in request.path else 'admin'
+        if user.is_ambassador and scope == 'admin':
+            raise exceptions.AuthenticationFailed('Unauthorized!')
         # get jwt
-        jwt = JWTAuth.get_jwt(user.id)
+        jwt = JWTAuth.get_jwt(user.id, scope)
         # set cookie
         res = Response()
         res.set_cookie('jwt', jwt, httponly=True)
@@ -77,9 +77,14 @@ class LogoutAPIView(APIView):
 
 class UserAPIView(APIView):
 
-    def get(self, request):
+    def get(self, request: Request):
         """GET method for User Info API"""
-        return Response(UserSerializer(request.user).data)
+        user = UserSerializer(request.user).data
+
+        # insert revenue in data
+        user.update({'revenue': request.user.revenue})
+
+        return Response(user)
 
 
 class UserUpdateAPIView(APIView):

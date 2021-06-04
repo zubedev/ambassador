@@ -7,6 +7,8 @@ logger = getLogger(__name__)
 
 
 class UserSerializer(serializers.ModelSerializer):
+    revenue = serializers.SerializerMethodField('get_revenue')
+
     class Meta:
         model = get_user_model()
         fields = '__all__'
@@ -19,6 +21,9 @@ class UserSerializer(serializers.ModelSerializer):
                 'min_length': 8,  # minimum length of password
                 'style': {'input_type': 'password'},  # for browsable API
         }}
+
+    def get_revenue(self, obj):
+        return obj.revenue
 
     def create(self, validated_data):
         """Overriding to handle with custom user manager"""

@@ -76,6 +76,14 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
+    @property
+    def revenue(self):
+        orders = self.order_set.filter(is_complete=True)
+        if self.is_ambassador:
+            return sum(o.ambassador_revenue for o in orders)
+        else:  # admin
+            return sum(o.admin_revenue for o in orders)
+
 
 class Product(TimeStampedModel):
     """Product model"""
@@ -115,6 +123,16 @@ class Order(TimeStampedModel):
 
     def __str__(self):
         return self.code
+
+    @property
+    def admin_revenue(self):
+        items = self.order_items.all()
+        return sum(i.admin_revenue for i in items)
+
+    @property
+    def ambassador_revenue(self):
+        items = self.order_items.all()
+        return sum(i.ambassador_revenue for i in items)
 
 
 class OrderItem(TimeStampedModel):
