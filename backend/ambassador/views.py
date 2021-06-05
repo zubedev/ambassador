@@ -23,6 +23,9 @@ class ProductFrontendView(generics.ListAPIView):
 class ProductBackendView(generics.ListAPIView):
     # queryset = Product.objects.all()  # overridden with get_queryset()
     serializer_class = ProductSerializer
+    search_fields = ('title', 'description')
+    ordering_fields = ('id', 'title', 'price')
+    ordering = ('id', )  # default order
 
     def get_queryset(self):
         """Overridden to include redis caching"""

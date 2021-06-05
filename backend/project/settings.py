@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 3rd party apps
     'rest_framework',
+    'django_filters',
     'corsheaders',
     'django_probes',
     # project apps
@@ -169,7 +170,9 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',
         # https://www.django-rest-framework.org/api-guide/filtering/#orderingfilter
         'rest_framework.filters.OrderingFilter'
-    ]
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'common.pagination.CustomPagination',
+    'PAGE_SIZE': 10
 }
 
 
