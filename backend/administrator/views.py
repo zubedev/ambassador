@@ -1,6 +1,7 @@
 from logging import getLogger
 
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -34,7 +35,9 @@ class ProductViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         """overriding to enable logging"""
         logger.debug(f"Creating product: {request.POST.get('title')}")
-        return super().create(request, *args, **kwargs)
+        response = super().create(request, *args, **kwargs)
+        self.clear_cache()
+        return response
 
     def retrieve(self, request, *args, **kwargs):
         """overriding to enable logging"""
@@ -44,12 +47,16 @@ class ProductViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         """overriding to enable logging"""
         logger.debug(f"Updating product: {self.lookup_field}={kwargs[self.lookup_field]}")
-        return super().update(request, *args, **kwargs)
+        response = super().update(request, *args, **kwargs)
+        self.clear_cache()
+        return response
 
     def partial_update(self, request, *args, **kwargs):
         """overriding to enable logging"""
         logger.debug(f"Partial update: {self.lookup_field}={kwargs[self.lookup_field]}")
-        return super().partial_update(request, *args, **kwargs)
+        response = super().partial_update(request, *args, **kwargs)
+        self.clear_cache()
+        return response
 
     def list(self, request, *args, **kwargs):
         """overriding to enable logging"""
@@ -59,7 +66,15 @@ class ProductViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         """overriding to enable logging"""
         logger.debug(f"Deleting product... {self.lookup_field}={kwargs[self.lookup_field]}")
-        return super().destroy(request, *args, **kwargs)
+        response = super().destroy(request, *args, **kwargs)
+        self.clear_cache()
+        return response
+
+    @staticmethod
+    def clear_cache():
+        logger.debug("Clearing products cache...")
+        cache.delete('products_backend')
+        [cache.delete(k) for k in cache.keys('*') if 'products_frontend' in k]
 
 
 class LinksAPIView(APIView):

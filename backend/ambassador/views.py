@@ -14,8 +14,9 @@ logger = getLogger(__name__)
 class ProductFrontendView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    ordering = ('id',)  # default order
 
-    @method_decorator(cache_page(15 * 60, key_prefix='products_backend'))
+    @method_decorator(cache_page(15 * 60, key_prefix='products_frontend'))
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, *kwargs)
 
