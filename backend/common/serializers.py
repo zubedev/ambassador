@@ -3,6 +3,8 @@ from logging import getLogger
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from core.models import Product
+
 logger = getLogger(__name__)
 
 
@@ -30,3 +32,9 @@ class UserSerializer(serializers.ModelSerializer):
         logger.debug(
             f"Creating user: email={validated_data.get('email', None)}")
         return self.Meta.model.objects.create_user(**validated_data)
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
