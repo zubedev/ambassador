@@ -77,6 +77,10 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     @property
+    def name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    @property
     def revenue(self):
         orders = self.order_set.filter(is_complete=True)
         if self.is_ambassador:

@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     'common',
     'administrator',
     'ambassador',
+    'checkout',
 ]
 
 MIDDLEWARE = [

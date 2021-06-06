@@ -5,9 +5,13 @@ from logging import getLogger
 from django.core.cache import cache
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from django_redis import get_redis_connection
 from rest_framework import generics, status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from common.auth import JWTAuth
 from common.serializers import ProductSerializer, LinkSerializer
 from core.models import Product, Link
 
@@ -65,3 +69,18 @@ class LinkCreateListView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return Link.objects.filter(user=self.request.user)
+
+
+class RankingsAPIView(APIView):
+    authentication_classes = [JWTAuth]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, _):
+        conn = get_redis_connection('default')
+
+        # https://redis.io/commands/zrevrangebyscore
+        rankings = conn.zrevrangebyscore('rankings', min=0, max=1000, withscores=True)
+
+        rankings = {rank[0].decode('utf-8'): rank[1] for rank in rankings}
+
+        return Response(rankings)

@@ -16,7 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = (
             'last_login', 'date_joined', 'groups', 'user_permissions',
-            'is_active', 'is_staff', 'is_superuser')
+            'is_active', 'is_staff', 'is_superuser', 'is_ambassador')
         extra_kwargs = {
             'password': {
                 'write_only': True,  # does not expose field in GET
