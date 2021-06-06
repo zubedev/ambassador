@@ -6,4 +6,5 @@ urlpatterns = [
     path('', include('common.urls')),
     path('products/frontend/', views.ProductFrontendView.as_view(), name='products_frontend'),
     path('products/backend/', views.ProductBackendView.as_view(), name='products_backend'),
+    path('links/', views.LinkCreateView.as_view(), name='links'),
 ]

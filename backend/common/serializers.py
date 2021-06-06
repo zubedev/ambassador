@@ -3,7 +3,7 @@ from logging import getLogger
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from core.models import Product
+from core.models import Product, Link
 
 logger = getLogger(__name__)
 
@@ -37,4 +37,19 @@ class UserSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
+        fields = '__all__'
+
+
+class LinkSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Link
+        fields = '__all__'
+
+
+class LinkProductSerializer(serializers.ModelSerializer):
+    # products = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
+    class Meta:
+        model = Link
         fields = '__all__'

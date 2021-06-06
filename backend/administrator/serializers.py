@@ -1,12 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Link, OrderItem, Order
-
-
-class LinkSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Link
-        fields = '__all__'
+from core.models import OrderItem, Order
 
 
 class OrderItemSerializer(serializers.ModelSerializer):

@@ -1,12 +1,15 @@
+import random
+import string
 from logging import getLogger
 
 from django.core.cache import cache
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from rest_framework import generics
+from rest_framework import generics, status
+from rest_framework.response import Response
 
-from common.serializers import ProductSerializer
-from core.models import Product
+from common.serializers import ProductSerializer, LinkProductSerializer
+from core.models import Product, Link
 
 logger = getLogger(__name__)
 
@@ -37,3 +40,21 @@ class ProductBackendView(generics.ListAPIView):
             cache.set('products_backend', qs, timeout=15 * 60)  # 15 mins TTL
 
         return qs
+
+
+class LinkCreateView(generics.CreateAPIView):
+    queryset = Link.objects.all()
+    serializer_class = LinkProductSerializer
+
+    def create(self, request, *args, **kwargs):
+        # add the user and code
+        request.data.update({
+            'user': request.user.id,
+            'code': ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
+        })
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
