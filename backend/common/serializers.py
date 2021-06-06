@@ -3,7 +3,7 @@ from logging import getLogger
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from core.models import Product, Link
+from core.models import Product, Link, Order
 
 logger = getLogger(__name__)
 
@@ -41,15 +41,16 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class LinkSerializer(serializers.ModelSerializer):
+    count = serializers.SerializerMethodField(method_name='get_count')
+    revenue = serializers.SerializerMethodField(method_name='get_revenue')
 
     class Meta:
         model = Link
         fields = '__all__'
 
+    def get_count(self, obj):
+        return Order.objects.filter(code=obj.code, is_complete=True).count()
 
-class LinkProductSerializer(serializers.ModelSerializer):
-    # products = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-
-    class Meta:
-        model = Link
-        fields = '__all__'
+    def get_revenue(self, obj):
+        orders = Order.objects.filter(code=obj.code, is_complete=True)
+        return sum(o.ambassador_revenue for o in orders)

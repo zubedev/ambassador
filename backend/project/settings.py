@@ -171,7 +171,7 @@ REST_FRAMEWORK = {
         # https://www.django-rest-framework.org/api-guide/filtering/#orderingfilter
         'rest_framework.filters.OrderingFilter'
     ],
-    'DEFAULT_PAGINATION_CLASS': 'common.pagination.CustomPagination',
+    'DEFAULT_PAGINATION_CLASS': 'common.backends.CustomPagination',
     'PAGE_SIZE': 10
 }
 

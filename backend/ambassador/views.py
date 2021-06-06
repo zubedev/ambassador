@@ -8,7 +8,7 @@ from django.views.decorators.cache import cache_page
 from rest_framework import generics, status
 from rest_framework.response import Response
 
-from common.serializers import ProductSerializer, LinkProductSerializer
+from common.serializers import ProductSerializer, LinkSerializer
 from core.models import Product, Link
 
 logger = getLogger(__name__)
@@ -42,9 +42,10 @@ class ProductBackendView(generics.ListAPIView):
         return qs
 
 
-class LinkCreateView(generics.CreateAPIView):
+class LinkCreateListView(generics.ListCreateAPIView):
     queryset = Link.objects.all()
-    serializer_class = LinkProductSerializer
+    serializer_class = LinkSerializer
+    ordering = ('id', )
 
     def create(self, request, *args, **kwargs):
         # add the user and code
@@ -58,3 +59,9 @@ class LinkCreateView(generics.CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Link.objects.filter(user=self.request.user)

@@ -1,7 +1,7 @@
 from logging import getLogger
 
 from django.contrib.auth import get_user_model
-from rest_framework import exceptions
+from rest_framework import exceptions, viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -11,6 +11,7 @@ from .auth import JWTAuth
 from .serializers import UserSerializer
 
 logger = getLogger(__name__)
+USER_MODEL = get_user_model()
 
 
 class RegisterAPIView(APIView):
@@ -42,7 +43,7 @@ class LoginAPIView(APIView):
         """POST method for Login"""
         data: dict = request.data
         # get the user
-        user = get_user_model().objects.filter(email=data.get('email')).first()
+        user = USER_MODEL.objects.filter(email=data.get('email')).first()
         # check if user exists
         if user is None:
             raise exceptions.AuthenticationFailed('User not found!')
@@ -111,3 +112,15 @@ class UserPasswordAPIView(APIView):
         request.user.save()
 
         return Response(UserSerializer(request.user).data)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = USER_MODEL.objects.all()
+    serializer_class = UserSerializer
+    # authentication_classes = ()  # check defaults in settings
+    # permission_classes = ()  # check defaults in settings
+    # filter_backends = ()  # check defaults in settings
+    filterset_fields = ('is_staff', 'is_superuser', 'is_ambassador', 'is_active')
+    search_field = ('id', 'email', 'first_name', 'last_name')
+    ordering_fields = ('id', 'email', 'first_name', 'last_name')
+    ordering = ('id', )
