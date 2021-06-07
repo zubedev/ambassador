@@ -113,7 +113,7 @@ class Link(TimeStampedModel):
 class Order(TimeStampedModel):
     """Order model"""
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    trans_id = models.CharField(max_length=100)
+    trans_id = models.CharField(max_length=100, blank=True)
     code = models.CharField(max_length=100)
     amb_email = models.EmailField()
     first_name = models.CharField(max_length=150)

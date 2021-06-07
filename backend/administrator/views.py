@@ -6,9 +6,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import OrderSerializer
 from common.serializers import UserSerializer, ProductSerializer, \
-    LinkSerializer
+    LinkSerializer, OrderSerializer
 from core.models import Product, Link, Order
 
 logger = getLogger(__name__)
