@@ -1,9 +1,11 @@
 from logging import getLogger
 
 import stripe
+from django.core.mail import send_mail
 from django.db import transaction
 from rest_framework import generics, exceptions, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from common.serializers import OrderSerializer
 from .serializers import LinkSerializer
@@ -65,3 +67,27 @@ class OrderCreateAPIView(generics.CreateAPIView):
 
         headers = self.get_success_headers(source)
         return Response(source, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class OrderConfirmAPIView(APIView):
+    def post(self, request):
+        order = Order.objects.filter(trans_id=request.data['source']).first()
+        if not order:
+            raise exceptions.APIException('Order not found!')
+
+        order.is_complete = True
+        order.save()
+
+        send_mail(  # Admin email
+            subject='An order has been completed',
+            message=f'Order #{order.id} with a total of ${order.admin_revenue} has been completed!',
+            from_email='noreply@email.com',
+            recipient_list=['admin@email.com'])
+
+        send_mail(  # Ambassador email
+            subject='An order has been completed',
+            message=f'You have earned ${order.ambassador_revenue} from the link #{order.code}',
+            from_email='noreply@email.com',
+            recipient_list=[order.amb_email])
+
+        return Response({'message': 'success'})
